@@ -1,42 +1,96 @@
-from utils.utils import generate_results_csv
-from utils.utils import create_directory
-from utils.utils import read_dataset
-from utils.utils import transform_mts_to_ucr_format
-from utils.utils import visualize_filter
-from utils.utils import viz_for_survey_paper
-from utils.utils import viz_cam
 import os
 import numpy as np
-import sys
-import sklearn
-import utils.utils
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+from sklearn import preprocessing
+
+from tensorflow import keras
+
 from utils.constants import CLASSIFIERS
 from utils.constants import ARCHIVE_NAMES
 from utils.constants import ITERATIONS
-from utils.utils import read_all_datasets
+from utils.utils import calculate_metrics
+
+from sklearn.model_selection import GridSearchCV
+from loguru import logger
 
 
-def fit_classifier():
-    x_train = datasets_dict[dataset_name][0]
-    y_train = datasets_dict[dataset_name][1]
-    x_test = datasets_dict[dataset_name][2]
-    y_test = datasets_dict[dataset_name][3]
 
-    nb_classes = len(np.unique(np.concatenate((y_train, y_test), axis=0)))
+def plot_data_samples(dataframe, sample_numbers):
+    ''' 
+    Plot the time series data relating to the input list of sample numbers.
 
+    sample_numbers: list of integers
+        E.g. [1, 7, 22, 42]
+    '''
+    
+    unique_labels = dataframe['label'].astype(int).unique()
+    num_classes = len(unique_labels)
+    if num_classes<=5:
+        class_colors = dict(zip(unique_labels, ['palevioletred', 'crimson', 'purple', 'midnightblue', 'darkorange'][:num_classes]))
+        palette = {sample: class_colors[class_number] for sample, class_number in dataframe.reset_index()[['index', 'label']].values}
+    else:
+        class_colors = sns.color_palette(n_colors=num_classes)
+
+    for i in sample_numbers:
+        logger.info(f'sample {i} is class {dataframe.loc[i, "label"].astype(int)}')
+
+    for_plotting = pd.melt(dataframe.reset_index(), id_vars=['index', 'label'], var_name='time', value_vars=[col for col in dataframe.columns if col not in ['molecule_number', 'label']])
+    for_plotting = for_plotting[for_plotting['index'].isin(sample_numbers)]
+    fig, ax = plt.subplots()
+    sns.lineplot(
+        data=for_plotting,
+        x='time',
+        y='value',
+        hue='index',
+        palette=palette,
+    )
+    ax.set_ylabel('Data value')
+    ax.set_xlabel('Timepoint')
+    ticks = [x for x in range(for_plotting['time'].astype(int).max()) if x % 100 == 0 ]
+    ax.set_xticks(ticks)
+    plt.legend(bbox_to_anchor=(1.0, 1.0))
+    plt.savefig(f"{output_folder}samples.png")
+
+
+def prepare_data(x_train, y_train, x_test, y_test,):
     # transform the labels from integers to one hot vectors
-    enc = sklearn.preprocessing.OneHotEncoder(categories='auto')
+    enc = preprocessing.OneHotEncoder(categories='auto')
     enc.fit(np.concatenate((y_train, y_test), axis=0).reshape(-1, 1))
-    y_train = enc.transform(y_train.reshape(-1, 1)).toarray()
-    y_test = enc.transform(y_test.reshape(-1, 1)).toarray()
+    y_train = enc.transform(y_train.values.reshape(-1, 1)).toarray()
+    y_test = enc.transform(y_test.values.reshape(-1, 1)).toarray()
 
     # save orignal y because later we will use binary
     y_true = np.argmax(y_test, axis=1)
 
     if len(x_train.shape) == 2:  # if univariate
         # add a dimension to make it multivariate with one dimension 
-        x_train = x_train.reshape((x_train.shape[0], x_train.shape[1], 1))
-        x_test = x_test.reshape((x_test.shape[0], x_test.shape[1], 1))
+        x_train = x_train.values.reshape((x_train.shape[0], x_train.shape[1], 1))
+        x_test = x_test.values.reshape((x_test.shape[0], x_test.shape[1], 1))
+
+    return x_train, y_train, x_test, y_test
+
+def fit_classifier(x_train, y_train, x_test, y_test, classifier_name, output_directory):
+
+    nb_classes = len(np.unique(np.concatenate((y_train, y_test), axis=0)))
+
+    # transform the labels from integers to one hot vectors
+    enc = preprocessing.OneHotEncoder(categories='auto')
+    enc.fit(np.concatenate((y_train, y_test), axis=0).reshape(-1, 1))
+    y_train = enc.transform(y_train.values.reshape(-1, 1)).toarray()
+    y_test = enc.transform(y_test.values.reshape(-1, 1)).toarray()
+
+    # save orignal y because later we will use binary
+    y_true = np.argmax(y_test, axis=1)
+
+    if len(x_train.shape) == 2:  # if univariate
+        # add a dimension to make it multivariate with one dimension 
+        x_train = x_train.values.reshape((x_train.shape[0], x_train.shape[1], 1))
+        x_test = x_test.values.reshape((x_test.shape[0], x_test.shape[1], 1))
 
     input_shape = x_train.shape[1:]
     classifier = create_classifier(classifier_name, input_shape, nb_classes, output_directory)
@@ -76,82 +130,64 @@ def create_classifier(classifier_name, input_shape, nb_classes, output_directory
         from classifiers import inception
         return inception.Classifier_INCEPTION(output_directory, input_shape, nb_classes, verbose)
 
+def train_new_model(time_data, labels, output_folder, itrs=1, classifier_name='resnet'):
 
-############################################### main
+    # Split data into train and test portions
+    X_train, X_test, y_train, y_test = train_test_split(time_data.T, labels)
 
-# change this directory for your machine
-root_dir = '/b/home/uha/hfawaz-datas/dl-tsc-temp/'
+    # ----------------------train model----------------------
 
-if sys.argv[1] == 'run_all':
-    for classifier_name in CLASSIFIERS:
-        print('classifier_name', classifier_name)
-
-        for archive_name in ARCHIVE_NAMES:
-            print('\tarchive_name', archive_name)
-
-            datasets_dict = read_all_datasets(root_dir, archive_name)
-
-            for iter in range(ITERATIONS):
-                print('\t\titer', iter)
-
-                trr = ''
-                if iter != 0:
-                    trr = '_itr_' + str(iter)
-
-                tmp_output_directory = root_dir + '/results/' + classifier_name + '/' + archive_name + trr + '/'
-
-                for dataset_name in utils.constants.dataset_names_for_archive[archive_name]:
-                    print('\t\t\tdataset_name: ', dataset_name)
-
-                    output_directory = tmp_output_directory + dataset_name + '/'
-
-                    create_directory(output_directory)
-
-                    fit_classifier()
-
-                    print('\t\t\t\tDONE')
-
-                    # the creation of this directory means
-                    create_directory(output_directory + '/DONE')
-
-elif sys.argv[1] == 'transform_mts_to_ucr_format':
-    transform_mts_to_ucr_format()
-elif sys.argv[1] == 'visualize_filter':
-    visualize_filter(root_dir)
-elif sys.argv[1] == 'viz_for_survey_paper':
-    viz_for_survey_paper(root_dir)
-elif sys.argv[1] == 'viz_cam':
-    viz_cam(root_dir)
-elif sys.argv[1] == 'generate_results_csv':
-    res = generate_results_csv('results.csv', root_dir)
-    print(res.to_string())
-else:
     # this is the code used to launch an experiment on a dataset
-    archive_name = sys.argv[1]
-    dataset_name = sys.argv[2]
-    classifier_name = sys.argv[3]
-    itr = sys.argv[4]
+    for itr in range(itrs):
+        output_directory = f'{output_folder}{classifier_name}_{itr}/'
 
-    if itr == '_itr_0':
-        itr = ''
+        logger.info(f'Method: {classifier_name} using {itr} iterations.')
 
-    output_directory = root_dir + '/results/' + classifier_name + '/' + archive_name + itr + '/' + \
-                       dataset_name + '/'
+        if os.path.exists(f'{output_directory}df_metrics.csv'):
+            logger.info(f'{classifier_name} using {itr} iteration already done')
+        else:
+            if not os.path.exists(output_directory):
+                os.makedirs(output_directory)
 
-    test_dir_df_metrics = output_directory + 'df_metrics.csv'
+            fit_classifier(X_train, y_train, X_test, y_test, classifier_name, output_directory)
 
-    print('Method: ', archive_name, dataset_name, classifier_name, itr)
+            logger.info('Training complete.')
 
-    if os.path.exists(test_dir_df_metrics):
-        print('Already done')
-    else:
+            # evaluate best model on test data
+            x_train, y_train, x_test, y_test = prepare_data(X_train, y_train, X_test, y_test,)
+            model = keras.models.load_model(output_directory + 'best_model.hdf5')
+            y_pred = model.predict(x_test)
+            y_pred = np.argmax(y_pred, axis=1)
+            y_true = np.argmax(y_test, axis=1)
+            model_metrics = calculate_metrics(y_true, y_pred, 0.0)
+            logger.info(f'Iteration {itr}: df metrics')
+            [logger.info(f'{measure}: {round(val, 2)}') for measure, val in model_metrics.T.reset_index().values]
 
-        create_directory(output_directory)
-        datasets_dict = read_dataset(root_dir, archive_name, dataset_name)
 
-        fit_classifier()
+if __name__ == '__main__':
 
-        print('DONE')
+    input_path ='PYTHON-PHOTOBLEACHING/Results/training_model/clean_data/cleaned_data.csv'
+    output_folder ='results/test_dl4tsc/'
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
 
-        # the creation of this directory means
-        create_directory(output_directory + '/DONE')
+    raw_data = pd.read_csv(input_path)
+    raw_data.drop([col for col in raw_data.columns.tolist() if 'Unnamed: ' in col], axis=1, inplace=True)
+    raw_data['label'] = raw_data['label'].fillna(0)
+
+
+    # plot some sample data
+    sample_0s = raw_data.reset_index()[raw_data.reset_index()['label'] == 0]['index'].tolist()[:3]
+    sample_1s = raw_data.reset_index()[raw_data.reset_index()['label'] == 1]['index'].tolist()[:3]
+    sample_2s = raw_data.reset_index()[raw_data.reset_index()['label'] == 2]['index'].tolist()[:3]
+    plot_data_samples(raw_data, sample_0s+sample_1s+sample_2s)
+
+    # prepare time series data
+    time_data = raw_data[[col for col in raw_data.columns.tolist() if col not in ['molecule_number', 'label']]].T.reset_index(drop=True)
+
+    # prepare label data
+    labels = raw_data['label'].copy().astype(int)
+
+    # train model
+    train_new_model(time_data, labels, output_folder, itrs=1, classifier_name='resnet')
+
