@@ -64,6 +64,11 @@ labelled_data = predict_labels(time_data, model_path='results/best_model.hdf5')
 
 ```
 
+### Disclaimer
+
+This package was forked and is maintained only for personal use. The material contained herein is provided on an as-is basis, and no garuantee is made of it's correctness or suitability for your needs. Please consider consulting the original package in the first instance.
+
+
 ## Reference
 
 If you re-use this work, please cite the original paper:
