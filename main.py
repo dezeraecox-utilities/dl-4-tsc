@@ -1,19 +1,19 @@
-from dl4tsc.utils.utils import generate_results_csv
-from dl4tsc.utils.utils import create_directory
-from dl4tsc.utils.utils import read_dataset
-from dl4tsc.utils.utils import transform_mts_to_ucr_format
-from dl4tsc.utils.utils import visualize_filter
-from dl4tsc.utils.utils import viz_for_survey_paper
-from dl4tsc.utils.utils import viz_cam
+from utils.utils import generate_results_csv
+from utils.utils import create_directory
+from utils.utils import read_dataset
+from utils.utils import transform_mts_to_ucr_format
+from utils.utils import visualize_filter
+from utils.utils import viz_for_survey_paper
+from utils.utils import viz_cam
 import os
 import numpy as np
 import sys
 import sklearn
-import dl4tsc.utils.utils
-from dl4tsc.utils.constants import CLASSIFIERS
-from dl4tsc.utils.constants import ARCHIVE_NAMES
-from dl4tsc.utils.constants import ITERATIONS
-from dl4tsc.utils.utils import read_all_datasets
+import utils.utils
+from utils.constants import CLASSIFIERS
+from utils.constants import ARCHIVE_NAMES
+from utils.constants import ITERATIONS
+from utils.utils import read_all_datasets
 
 
 def fit_classifier():
