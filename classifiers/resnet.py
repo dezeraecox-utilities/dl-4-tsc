@@ -9,7 +9,7 @@ import time
 import matplotlib
 from utils.utils import save_test_duration
 
-matplotlib.use('agg')
+# matplotlib.use('agg')
 import matplotlib.pyplot as plt
 
 from utils.utils import save_logs
@@ -121,9 +121,9 @@ class Classifier_RESNET:
         return model
 
     def fit(self, x_train, y_train, x_val, y_val, y_true):
-        if not tf.test.is_gpu_available:
-            print('error')
-            exit()
+        # if not tf.test.is_gpu_available:
+        #     print('error')
+        #     exit()
         # x_val and y_val are only used to monitor the test loss and NOT for training
         batch_size = 64
         nb_epochs = 1500
