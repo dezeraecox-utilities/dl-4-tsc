@@ -1,0 +1,22 @@
+name: sm_learning
+channels:
+  - conda-forge
+  - intel
+  - anaconda
+  - defaults
+dependencies:
+  - scikit-learn
+  - matplotlib
+  - keras==2.4.3
+  - h5py==2.10.0
+  - cython
+  - pandas
+  - numpy
+  - scipy
+  - tensorflow
+  - ipython
+  - ipykernel
+  - seaborn
+  - pip:
+    - loguru
+    - git+https://www.github.com/keras-team/keras-contrib
