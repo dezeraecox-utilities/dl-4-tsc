@@ -16,7 +16,7 @@ The code is divided as follows:
 
 ## Prerequisites
 
-All python packages needed are listed in [environment.yml](environment.yml) file. It is recommended to use Conda for environment management, and a new conda environment containing all the dependencies can be created at the command line using:
+All required python packages are listed in the [environment.yml](environment.yml) file. It is recommended to use Conda for environment management, and a new conda environment containing all the dependencies can be created at the command line using:
 
 ```conda env create -f environment.yml```
 
@@ -56,7 +56,7 @@ train_new_model(time_data, labels, output_folder, classifier_name='resnet')
 ```
 ### Predict labels for a new dataset
 
-Once you have a complete model trained (and are satisfied with the training metrics), then this model can be reloaded at any time for prediction of new datasets. Functions for this are provided in the [predict.py](predict.py) script, and can be used on data as shown above (missing the label column). 
+Once you have a complete model trained (and are satisfied with the training metrics), then this model can be reloaded at any time for prediction of new datasets. Functions for this are provided in the [predict.py](predict.py) script, and can be used on data as shown above (obviously in the absence of the label column). 
 ```
 from dl4tsc.utils.predict import predict_labels
 
