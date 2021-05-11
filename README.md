@@ -10,9 +10,9 @@ This repository was forked for incorporation into an analysis pipeline designed 
 
 The code is divided as follows:
 
-- The [main.py](https://github.com/hfawaz/dl-4-tsc/blob/master/main.py) python file contains the necessary code to train a new model against a benchmarking dataset. See below for requirements and input format.
-- The [utils](https://github.com/hfawaz/dl-4-tsc/tree/master/utils) folder contains the necessary functions to read the datasets and visualize the plots used in the initial paper. These functions have been left untouched. Additional functions to apply pre-trained models for predictive purposes have also been added.
-- The [classifiers](https://github.com/hfawaz/dl-4-tsc/tree/master/classifiers) folder contains nine python files, one for each deep neural network tested in the original paper. These files, as far as possible, have been left untouched.
+- The [main.py](main.py) python file contains the necessary code to train a new model against a benchmarking dataset. See below for requirements and input format.
+- The [utils](utils) folder contains the necessary functions to read the datasets and visualize the plots used in the initial paper. These functions have been left untouched. Additional functions to apply pre-trained models for predictive purposes have also been added.
+- The [classifiers](classifiers) folder contains nine python files, one for each deep neural network tested in the original paper. These files, as far as possible, have been left untouched.
 
 ## Prerequisites
 
