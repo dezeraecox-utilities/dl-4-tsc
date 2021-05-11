@@ -20,3 +20,4 @@ dependencies:
   - pip:
     - loguru
     - git+https://www.github.com/keras-team/keras-contrib
+    - git+https://github.com/dezeraecox-utilities/dl-4-tsc.git#egg=dl4tsc
