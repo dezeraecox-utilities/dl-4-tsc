@@ -74,6 +74,7 @@ def prepare_data(x_train, y_train, x_test, y_test,):
 
     return x_train, y_train, x_test, y_test
 
+
 def fit_classifier(x_train, y_train, x_test, y_test, classifier_name, output_directory):
 
     nb_classes = len(np.unique(np.concatenate((y_train, y_test), axis=0)))
@@ -130,6 +131,7 @@ def create_classifier(classifier_name, input_shape, nb_classes, output_directory
         from classifiers import inception
         return inception.Classifier_INCEPTION(output_directory, input_shape, nb_classes, verbose)
 
+
 def train_new_model(time_data, labels, output_folder, itrs=1, classifier_name='resnet'):
 
     # Split data into train and test portions
@@ -137,7 +139,6 @@ def train_new_model(time_data, labels, output_folder, itrs=1, classifier_name='r
 
     # ----------------------train model----------------------
 
-    # this is the code used to launch an experiment on a dataset
     for itr in range(itrs):
         output_directory = f'{output_folder}{classifier_name}_{itr}/'
 
@@ -166,7 +167,7 @@ def train_new_model(time_data, labels, output_folder, itrs=1, classifier_name='r
 
 if __name__ == '__main__':
 
-    input_path ='PYTHON-PHOTOBLEACHING/Results/training_model/clean_data/cleaned_data.csv'
+    input_path ='tests/cleaned_data.csv'
     output_folder ='results/test_dl4tsc/'
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
