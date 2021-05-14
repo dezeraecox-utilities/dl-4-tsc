@@ -16,7 +16,7 @@ The code is divided as follows:
 
 ## Prerequisites
 
-All required python packages are listed in the [environment.yml](environment.yml) file. It is recommended to use Conda for environment management, and a new conda environment containing all the dependencies can be created at the command line using:
+All required python packages are listed in the [environment.yml](environment.yml) file. It is recommended to use [Conda](https://docs.conda.io/projects/conda/en/latest/) for environment management, and a new conda environment containing all the dependencies can be created at the command line using:
 
 ```conda env create -f environment.yml```
 
@@ -36,10 +36,10 @@ To train a model against a new dataset, you first need a DataFrame containing un
 | 4       |0        | 45  |70   |85   |
 | 5       |1        | 45  |31   |16   |
 
-Once this data is prepared, it should then be split into timepoint data and label data which is then compatible with the fit_new_model function found in the [main](main.py) script:
+Once this data is prepared, it should then be split into timepoint data and label data which is then compatible with the fit_new_model function found in the [train](train.py) script:
 
 ```
-from dl4tsc.main import train_new_model
+from dl4tsc.utils.train import train_new_model
 
 # define location to save model
 output_folder = 'results/'
