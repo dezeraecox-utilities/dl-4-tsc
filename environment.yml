@@ -1,4 +1,4 @@
-name: sm_learning
+name: dl4tsc
 channels:
   - conda-forge
   - intel
