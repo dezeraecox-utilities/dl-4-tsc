@@ -7,8 +7,8 @@ from sklearn.linear_model import Ridge
 
 import gc
 
-from utils.utils import calculate_metrics
-from utils.utils import create_directory
+from dl4tsc.utils.utils import calculate_metrics
+from dl4tsc.utils.utils import create_directory
 from sklearn.model_selection import train_test_split
 
 import time

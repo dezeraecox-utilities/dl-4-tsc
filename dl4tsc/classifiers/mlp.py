@@ -8,8 +8,8 @@ import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt 
 
-from utils.utils import save_logs
-from utils.utils import calculate_metrics
+from dl4tsc.utils.utils import save_logs
+from dl4tsc.utils.utils import calculate_metrics
 
 class Classifier_MLP:
 

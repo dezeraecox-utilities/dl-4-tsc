@@ -10,10 +10,10 @@ from sklearn import preprocessing
 
 from tensorflow import keras
 
-from utils.constants import CLASSIFIERS
-from utils.constants import ARCHIVE_NAMES
-from utils.constants import ITERATIONS
-from utils.utils import calculate_metrics
+from dl4tsc.utils.constants import CLASSIFIERS
+from dl4tsc.utils.constants import ARCHIVE_NAMES
+from dl4tsc.utils.constants import ITERATIONS
+from dl4tsc.utils.utils import calculate_metrics
 
 from sklearn.model_selection import GridSearchCV
 from loguru import logger
