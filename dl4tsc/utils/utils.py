@@ -11,8 +11,6 @@ matplotlib.rcParams['font.sans-serif'] = 'Arial'
 import os
 import operator
 
-import utils
-
 from utils.constants import UNIVARIATE_DATASET_NAMES as DATASET_NAMES
 from utils.constants import UNIVARIATE_DATASET_NAMES_2018 as DATASET_NAMES_2018
 from utils.constants import ARCHIVE_NAMES  as ARCHIVE_NAMES
