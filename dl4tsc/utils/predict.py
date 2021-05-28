@@ -6,13 +6,6 @@ import pandas as pd
 from tensorflow import keras
 from loguru import logger
 
-model_path = f'results/best_model.hdf5'
-data_path = f'results/clean_data.csv'
-output_folder = f'results/'
-
-if not os.path.exists(output_folder):
-    os.makedirs(output_folder)
-
 def prepare_data_to_predict(time_data):
 
     return time_data.values.reshape((time_data.shape[0], time_data.shape[1], 1))
@@ -30,6 +23,13 @@ def predict_labels(time_data, model_path):
     return time_data
 
 if __name__ == '__main__':
+
+    model_path = f'results/best_model.hdf5'
+    data_path = f'results/clean_data.csv'
+    output_folder = f'results/'
+
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
 
     # Read in dataset
     raw_data = pd.read_csv(data_path)

@@ -1,23 +1,16 @@
 import os
-import numpy as np
+
 import matplotlib.pyplot as plt
-import seaborn as sns
+import numpy as np
 import pandas as pd
-
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
-from sklearn import preprocessing
-
-from tensorflow import keras
-
-from dl4tsc.utils.constants import CLASSIFIERS
-from dl4tsc.utils.constants import ARCHIVE_NAMES
-from dl4tsc.utils.constants import ITERATIONS
+import seaborn as sns
+from dl4tsc.utils.constants import ARCHIVE_NAMES, CLASSIFIERS, ITERATIONS
 from dl4tsc.utils.utils import calculate_metrics
-
-from sklearn.model_selection import GridSearchCV
 from loguru import logger
-
+from sklearn import preprocessing
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import GridSearchCV, train_test_split
+from tensorflow import keras
 
 
 def plot_data_samples(dataframe, sample_numbers):
